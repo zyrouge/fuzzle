@@ -1,4 +1,4 @@
-name: Yukino Discord MAL Feed
+name: Yukino Discord Feeds
 on:
     workflow_dispatch:
     schedule:
@@ -18,10 +18,15 @@ jobs:
             - name: Install deps
               run: yarn
 
-            - name: Run task
+            - name: Run task (MAL)
               run: yarn ts-run ./yukino-discord/mal-feed
               env:
                   YUKINO_MAL_WEBHOOK_URL: ${{ secrets.YUKINO_MAL_WEBHOOK_URL }}
+
+            - name: Run task (ANN)
+              run: yarn ts-run ./yukino-discord/ann-feed
+              env:
+                  YUKINO_ANN_WEBHOOK_URL: ${{ secrets.YUKINO_ANN_WEBHOOK_URL }}
 
             - name: Commit files
               run: |

@@ -2,28 +2,29 @@ import path from "path";
 import fs from "fs-extra";
 import { chunk } from "lodash";
 import RssParser from "rss-parser";
-import DiscordWebhook, { WebhookPayload } from "../utils/discord-webhook";
-import ExecuteOrReturn from "../utils/execute-or-return";
-import HandlePromiseEnd from "../utils/handle-promise-end";
+import DiscordWebhook, { WebhookPayload } from "../../utils/discord-webhook";
+import ExecuteOrReturn from "../../utils/execute-or-return";
+import HandlePromiseEnd from "../../utils/handle-promise-end";
 
-const HookName = "MyAnimeList News";
+const HookName = "Anime News Network";
 const HookAvatar =
-    "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png";
-const MALFeedURL = "https://myanimelist.net/rss/news.xml";
+    "https://yt3.ggpht.com/ytc/AAUvwni3WHvdvHGRxneUqiOh92U1tX-7OqKtzQwOfxrk=s900-c-k-c0x00ffffff-no-rj";
+const ANNFeedURL =
+    "https://www.animenewsnetwork.com/news/rss.xml?ann-edition=us";
 const LastFeedDataFile = path.join(__dirname, "lastfeed.json");
 
 export default ExecuteOrReturn(async () => {
-    const webhookURL = process.env.YUKINO_MAL_WEBHOOK_URL;
+    const webhookURL = process.env.YUKINO_ANN_WEBHOOK_URL;
     if (!webhookURL)
-        throw new Error("Missing 'process.env.YUKINO_MAL_WEBHOOK_URL'");
+        throw new Error("Missing 'process.env.YUKINO_ANN_WEBHOOK_URL'");
 
     const rss = new RssParser({
         customFields: {
-            item: ["media:thumbnail"],
+            item: [],
         },
     });
 
-    let { items: allFeeds } = await rss.parseURL(MALFeedURL);
+    let { items: allFeeds } = await rss.parseURL(ANNFeedURL);
     const lastUpdated = await getLastFeedTime();
     if (lastUpdated) {
         allFeeds = allFeeds.filter((x) => {
@@ -41,27 +42,26 @@ export default ExecuteOrReturn(async () => {
             username: HookName,
             avatar_url: HookAvatar,
             embeds: feeds.map((x) => ({
-                title: x.title,
+                title: `${x.title} ${
+                    x.categories?.length ? `(${x.categories.join(", ")})` : ""
+                }`,
                 description: x.content,
                 url: x.link,
-                color: 0x2f51a0,
-                thumbnail: {
-                    url: x["media:thumbnail"],
-                },
+                color: 0x98cb3b,
                 footer: {
-                    text: `Published on ${x.pubDate}`,
+                    text: `Published: ${x.pubDate}`,
                 },
             })),
         };
 
         await HandlePromiseEnd(
-            `Yukino-MAL-Feed-${i}`,
+            `${HookName}-${i}`,
             DiscordWebhook(webhookURL, payload)
         );
         i += 1;
     }
 
-    HandlePromiseEnd("Yukino-MAL-Feed-Info-File", updateLastFeedTime());
+    HandlePromiseEnd(`${HookName}-Info-File`, updateLastFeedTime());
 });
 
 async function getLastFeedTime(): Promise<number | null> {
