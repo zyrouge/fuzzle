@@ -32,6 +32,8 @@ export default ExecuteOrReturn(async () => {
             return date > lastUpdated;
         });
     }
+    if (!allFeeds.length)
+        return console.log(`Seems like no new feeds were available!`);
 
     let i = 1;
     for (const feeds of chunk(allFeeds, 5)) {

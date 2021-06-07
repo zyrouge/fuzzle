@@ -1,0 +1,35 @@
+name: "Close stale issues"
+on:
+    schedule:
+        - cron: "*/30 * * * *"
+
+jobs:
+    main:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: "14.x"
+
+            - name: Install deps
+              run: yarn
+
+            - name: Run task
+              run: yarn ts-run ./yukino-discord/mal-feed
+              env:
+                  YUKINO_MAL_WEBHOOK_URL: ${{ secrets.YUKINO_MAL_WEBHOOK_URL }}
+
+            - name: Commit files
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name  "github-actions[bot]"
+                  git add .
+                  git commit -m "chore: task run"
+
+            - name: Push changes
+              uses: ad-m/github-push-action@master
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
