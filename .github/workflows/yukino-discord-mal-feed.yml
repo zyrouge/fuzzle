@@ -1,5 +1,6 @@
 name: Yukino Discord MAL Feed
 on:
+    workflow_dispatch:
     schedule:
         - cron: "*/30 * * * *"
 
