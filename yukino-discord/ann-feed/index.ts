@@ -38,6 +38,8 @@ export default ExecuteOrReturn(async () => {
     if (!allFeeds.length)
         return console.log(`Seems like no new feeds were available!`);
 
+    allFeeds = allFeeds.sort((a, b) => a.isoDate.getTime() - b.isoDate.getTime());
+
     let i = 1;
     for (const feeds of chunk(allFeeds, 5)) {
         const payload: WebhookPayload = {
