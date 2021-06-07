@@ -5,12 +5,14 @@ import RssParser from "rss-parser";
 import DiscordWebhook, { WebhookPayload } from "../../utils/discord-webhook";
 import ExecuteOrReturn from "../../utils/execute-or-return";
 import HandlePromiseEnd from "../../utils/handle-promise-end";
+import sleep from "../../utils/sleep";
 
 const HookName = "MyAnimeList News";
 const HookAvatar =
     "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png";
 const MALFeedURL = "https://myanimelist.net/rss/news.xml";
 const LastFeedDataFile = path.join(__dirname, "lastfeed.json");
+const SleepInterval = 1000;
 
 export default ExecuteOrReturn(async () => {
     const webhookURL = process.env.YUKINO_MAL_WEBHOOK_URL;
@@ -59,6 +61,7 @@ export default ExecuteOrReturn(async () => {
             DiscordWebhook(webhookURL, payload)
         );
         i += 1;
+        sleep(SleepInterval);
     }
 
     HandlePromiseEnd(`${HookName}-Info-File`, updateLastFeedTime());
