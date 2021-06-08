@@ -29,7 +29,7 @@ export default ExecuteOrReturn(async () => {
     const lastUpdated = await getLastFeedTime();
     if (lastUpdated) {
         allFeeds = allFeeds.filter((x) => {
-            if (!x.isoDate) return true;
+            if (!x.isoDate) return false;
             const date = new Date(x.isoDate).getTime();
             return date > lastUpdated;
         });
@@ -37,7 +37,10 @@ export default ExecuteOrReturn(async () => {
     if (!allFeeds.length)
         return console.log(`Seems like no new feeds were available!`);
 
-    allFeeds = allFeeds.sort((a, b) => a.isoDate.getTime() - b.isoDate.getTime());
+    allFeeds = allFeeds.sort(
+        (a, b) =>
+            new Date(a.isoDate!).getTime() - new Date(b.isoDate!).getTime()
+    );
 
     let i = 1;
     for (const feeds of chunk(allFeeds, 5)) {
