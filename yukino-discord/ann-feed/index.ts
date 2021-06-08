@@ -13,7 +13,7 @@ const HookAvatar =
 const ANNFeedURL =
     "https://www.animenewsnetwork.com/news/rss.xml?ann-edition=us";
 const LastFeedDataFile = path.join(__dirname, "lastfeed.json");
-const SleepInterval = 1000;
+const SleepInterval = 2000;
 
 export default ExecuteOrReturn(async () => {
     const webhookURL = process.env.YUKINO_ANN_WEBHOOK_URL;
@@ -66,7 +66,7 @@ export default ExecuteOrReturn(async () => {
             DiscordWebhook(webhookURL, payload)
         );
         i += 1;
-        sleep(SleepInterval);
+        await sleep(SleepInterval);
     }
 
     HandlePromiseEnd(`${HookName}-Info-File`, updateLastFeedTime());
