@@ -1,0 +1,54 @@
+name: Yukino Discord Feeds
+
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: "*/30 * * * *"
+
+env:
+    X_DATA_BRANCH: data
+
+jobs:
+    main:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "20.x"
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm install --ci
+
+            - name: Clone upstream data
+              continue-on-error: true
+              run: |
+                  git clone -b $X_DATA_BRANCH https://github.com/$GITHUB_REPOSITORY data
+                  rm -rf ./data/.git
+
+            - name: MAL Feed
+              run: npm run yukino-discord:mal-feed
+              env:
+                  YUKINO_MAL_WEBHOOK_URL: ${{ secrets.YUKINO_MAL_WEBHOOK_URL }}
+
+            - name: ANN Feed
+              run: npm run yukino-discord:ann-feed
+              env:
+                  YUKINO_ANN_WEBHOOK_URL: ${{ secrets.YUKINO_ANN_WEBHOOK_URL }}
+
+            - name: CR Feed
+              run: npm run yukino-discord:cr-feed
+              env:
+                  YUKINO_CR_WEBHOOK_URL: ${{ secrets.YUKINO_CR_WEBHOOK_URL }}
+
+            - name: Push data upstream
+              uses: zyrouge/github-push-action@v1
+              with:
+                  directory: ./data
+                  branch: ${{ env.X_DATA_BRANCH }}
+                  skip-fetch: true
+                  checkout-orphan: true
+                  force: true

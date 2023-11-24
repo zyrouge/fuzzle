@@ -1,27 +1,27 @@
-import got from "got";
-import DiscordAPI from "discord-api-types/v8";
+import { request } from "undici";
+import DiscordAPI from "discord-api-types/v10";
 
-export type WebhookPayload = DiscordAPI.RESTPostAPIWebhookWithTokenJSONBody;
+export interface DiscordWebhookInfo {
+    id: string;
+    token: string;
+}
 
-export default (
-    wbhk:
-        | string
-        | {
-              id: string;
-              token: string;
-          },
-    payload: WebhookPayload
+export type DiscordWebhookPayload =
+    DiscordAPI.RESTPostAPIWebhookWithTokenJSONBody;
+
+export const postDiscordWebhook = async (
+    webhook: string | DiscordWebhookInfo,
+    payload: DiscordWebhookPayload
 ) => {
     const url =
-        typeof wbhk === "string"
-            ? wbhk
-            : `https://discord.com/api/webhooks/${wbhk.id}/${wbhk.token}`;
-
-    const contentType = "application/json";
-    return got.post(url, {
+        typeof webhook === "string"
+            ? webhook
+            : `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}`;
+    return request(url, {
+        method: "POST",
         body: JSON.stringify(payload),
         headers: {
-            "Content-Type": contentType,
+            "Content-Type": "application/json",
         },
     });
 };
