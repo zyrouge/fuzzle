@@ -69,6 +69,15 @@ export class LocalStorage<T = any> {
     static dataDir = p.resolve(__dirname, "../data");
 }
 
-export const commonStorage = new LocalStorage(
-    p.join(LocalStorage.dataDir, "common.json")
-);
+class CommonStorage extends LocalStorage {
+    constructor() {
+        super(p.join(LocalStorage.dataDir, "common.json"));
+    }
+
+    async get<T>(key: string, defaultValue?: T) {
+        const value = await super.get(key);
+        return (value ?? defaultValue) as T;
+    }
+}
+
+export const commonStorage = new CommonStorage();

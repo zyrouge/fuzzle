@@ -28,7 +28,7 @@ const start = async () => {
     });
 
     let { items: allFeeds } = await rss.parseURL(MAL_FEED_URL);
-    const lastUpdated = await commonStorage.get(COMMON_STORAGE_KEY);
+    const lastUpdated = await commonStorage.get(COMMON_STORAGE_KEY, 0);
     if (lastUpdated) {
         allFeeds = allFeeds.filter((x) => {
             if (!x.isoDate) return false;
