@@ -1,0 +1,35 @@
+name: Yukino Discord Feeds
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: "*/30 * * * *"
+
+jobs:
+    main:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: "14.x"
+
+            - name: Install deps
+              run: yarn
+
+            - name: Run task (MAL)
+              run: yarn ts-run ./yukino-discord/mal-feed
+              env:
+                  YUKINO_MAL_WEBHOOK_URL: ${{ secrets.YUKINO_MAL_WEBHOOK_URL }}
+
+            - name: Run task (ANN)
+              run: yarn ts-run ./yukino-discord/ann-feed
+              env:
+                  YUKINO_ANN_WEBHOOK_URL: ${{ secrets.YUKINO_ANN_WEBHOOK_URL }}
+
+            - name: Commit files
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name  "github-actions[bot]"
+                  git add . && git commit -m "chore: task run" && git push || echo "No changes to push"
