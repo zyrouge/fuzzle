@@ -38,7 +38,7 @@ const start = async () => {
         });
     }
     if (!allFeeds.length) {
-        return console.log("Seems like no new feeds were available!");
+        return console.log("Nothing new in feeds");
     }
 
     allFeeds = allFeeds.sort(
@@ -57,7 +57,7 @@ const start = async () => {
                 url: x.link,
                 color: 0xf47521,
                 thumbnail: {
-                    url: x["media:thumbnail"],
+                    url: x["media:thumbnail"].$.url,
                 },
                 footer: {
                     text: `Published: ${x.pubDate}`,

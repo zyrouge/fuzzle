@@ -17,11 +17,14 @@ export const postDiscordWebhook = async (
         typeof webhook === "string"
             ? webhook
             : `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}`;
-    return request(url, {
+    const resp = await request(url, {
         method: "POST",
         body: JSON.stringify(payload),
         headers: {
             "Content-Type": "application/json",
         },
     });
+    if (resp.statusCode !== 204) {
+        throw new Error(`Webhook request failed with status ${resp.statusCode}`);
+    }
 };
