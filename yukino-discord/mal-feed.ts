@@ -37,7 +37,7 @@ const start = async () => {
         });
     }
     if (!allFeeds.length) {
-        return console.log("Nothing new in feeds");
+        return console.log("Nothing new in feeds.");
     }
 
     allFeeds = allFeeds.sort(
