@@ -2,8 +2,8 @@ name: Yukino Discord Feeds
 
 on:
     workflow_dispatch:
-    schedule:
-        - cron: "*/30 * * * *"
+#    schedule:
+#        - cron: "* * * * *"
 
 env:
     X_DATA_BRANCH: data
